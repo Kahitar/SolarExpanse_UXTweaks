@@ -11,7 +11,7 @@ A small quality-of-life mod for Solar Expanse.
 ## Installation
 
 1. Install BepInEx for Solar Expanse first. Use the official BepInEx installation guide:
-   <https://docs.bepinex.dev/master/articles/user_guide/installation/index.html>
+   <https://docs.bepinex.dev/articles/user_guide/installation/index.html>
 2. Download the latest `UXTweaks_v*.zip` from the UXTweaks releases page:
    <https://github.com/Kahitar/SolarExpanse_UXTweaks/releases/latest>
 3. Open your Solar Expanse game folder.
