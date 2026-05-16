@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Changed
-- Extended single-click camera retarget suppression and double-click zoom/follow behavior to mission markers.
+- Extended single-click camera retarget suppression and double-click zoom/follow behavior to map mission labels.
 
 ## [1.0.0] - 2026-05-16
 ### Added
