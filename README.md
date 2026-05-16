@@ -5,7 +5,7 @@ A BepInEx/Harmony mod for Solar Expanse focused on UI and camera quality-of-life
 ## Features
 
 - Expands Object Info window sub-lists so Facilities, Resources, Explored Resources, Rockets, Launch Vehicles, and Missions use the outer Object Info scrollbar instead of nested two-row scrollbars.
-- Stops normal body clicks from forcing the map camera to zoom to and follow the clicked body while still opening the Object Info window.
+- Stops single body clicks from forcing the map camera to zoom to and follow the clicked body while still opening the Object Info window. Double-clicking the same body keeps the game's original zoom-and-follow behavior.
 
 ## Build
 

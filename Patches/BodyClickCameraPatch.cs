@@ -11,6 +11,11 @@ namespace SolarExpanseUXTweaks.Patches
     [HarmonyPatch(typeof(InfoBase), nameof(InfoBase.MyOnMouseUpAsButton2))]
     internal static class BodyClickCameraSuppressionScopePatch
     {
+        private const float DoubleClickSeconds = 0.3f;
+
+        private static Transform lastClickTarget;
+        private static float lastClickTime = -100f;
+
         [ThreadStatic]
         private static Stack<Transform> suppressedTargets;
 
@@ -47,12 +52,35 @@ namespace SolarExpanseUXTweaks.Patches
                 return;
             }
 
+            if (ShouldAllowFocusForDoubleClick(__state))
+            {
+                __state = null;
+                return;
+            }
+
             if (suppressedTargets == null)
             {
                 suppressedTargets = new Stack<Transform>();
             }
 
             suppressedTargets.Push(__state);
+        }
+
+        private static bool ShouldAllowFocusForDoubleClick(Transform target)
+        {
+            float now = Time.realtimeSinceStartup;
+            bool isDoubleClick = lastClickTarget == target && now - lastClickTime <= DoubleClickSeconds;
+
+            if (isDoubleClick)
+            {
+                lastClickTarget = null;
+                lastClickTime = -100f;
+                return true;
+            }
+
+            lastClickTarget = target;
+            lastClickTime = now;
+            return false;
         }
 
         [HarmonyFinalizer]
