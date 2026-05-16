@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SolarExpanseUXTweaks.Patches
 {
     [HarmonyPatch(typeof(InfoBase), nameof(InfoBase.MyOnMouseUpAsButton2))]
-    internal static class BodyClickCameraSuppressionScopePatch
+    internal static class MapObjectClickCameraSuppressionScopePatch
     {
         private const float DoubleClickSeconds = 0.3f;
 
@@ -19,7 +19,7 @@ namespace SolarExpanseUXTweaks.Patches
         [ThreadStatic]
         private static Stack<Transform> suppressedTargets;
 
-        internal static bool IsSuppressedBodyClickTarget(Transform target)
+        internal static bool IsSuppressedMapObjectClickTarget(Transform target)
         {
             if (target == null || suppressedTargets == null || suppressedTargets.Count == 0)
             {
@@ -40,13 +40,12 @@ namespace SolarExpanseUXTweaks.Patches
         [HarmonyPrefix]
         private static void Prefix(InfoBase __instance, ref Transform __state)
         {
-            ObjectInfo objectInfo = __instance as ObjectInfo;
-            if (objectInfo == null)
+            if (!ShouldGateCameraTarget(__instance))
             {
                 return;
             }
 
-            __state = objectInfo.transform;
+            __state = __instance.transform;
             if (__state == null)
             {
                 return;
@@ -83,6 +82,11 @@ namespace SolarExpanseUXTweaks.Patches
             return false;
         }
 
+        private static bool ShouldGateCameraTarget(InfoBase infoBase)
+        {
+            return infoBase is ObjectInfo || infoBase is MissionInfo;
+        }
+
         [HarmonyFinalizer]
         private static void Finalizer(Transform __state)
         {
@@ -116,12 +120,12 @@ namespace SolarExpanseUXTweaks.Patches
     }
 
     [HarmonyPatch(typeof(MyCameraController), nameof(MyCameraController.ChangeTarget), typeof(Transform), typeof(bool))]
-    internal static class BodyClickCameraChangeTargetPatch
+    internal static class MapObjectClickCameraChangeTargetPatch
     {
         [HarmonyPrefix]
         private static bool Prefix(Transform newTarget)
         {
-            if (!BodyClickCameraSuppressionScopePatch.IsSuppressedBodyClickTarget(newTarget))
+            if (!MapObjectClickCameraSuppressionScopePatch.IsSuppressedMapObjectClickTarget(newTarget))
             {
                 return true;
             }
