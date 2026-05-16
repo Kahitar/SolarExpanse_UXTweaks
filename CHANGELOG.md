@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-05-16
 ### Changed
 - Extended single-click camera retarget suppression and double-click zoom/follow behavior to map mission labels.
 
