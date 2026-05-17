@@ -1,9 +1,14 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using CameraControl;
 using CustomUpdate;
 using Game.Info;
+using Game.UI;
+using Game.UI.Windows.Elements.PlanMissionElements;
+using Game.UI.Windows.Elements.SearchObjectElements;
+using Game.UI.Windows.Windows;
 using Game.VisualizationScripts;
 using HarmonyLib;
 using UnityEngine;
@@ -24,6 +29,9 @@ namespace SolarExpanseUXTweaks.Patches
         [ThreadStatic]
         private static bool suppressTargetIsSpacecraftOnFly;
 
+        [ThreadStatic]
+        private static int suppressMissionPlanningCameraTargetDepth;
+
         internal static bool IsSuppressedMapObjectClickTarget(Transform target)
         {
             if (target == null || suppressedTargets == null || suppressedTargets.Count == 0)
@@ -43,6 +51,50 @@ namespace SolarExpanseUXTweaks.Patches
         }
 
         internal static bool SuppressTargetIsSpacecraftOnFly => suppressTargetIsSpacecraftOnFly;
+
+        internal static bool SuppressMissionPlanningCameraTarget => suppressMissionPlanningCameraTargetDepth > 0;
+
+        internal static bool IsMissionPlanningSearchSelectionContext()
+        {
+            try
+            {
+                UIManager uiManager = UIManager.Instance;
+                if (uiManager == null)
+                {
+                    return false;
+                }
+
+                PlanMissionWindow planMissionWindow = uiManager.GetWindow<PlanMissionWindow>();
+                if (planMissionWindow == null ||
+                    !planMissionWindow.Open ||
+                    planMissionWindow.CurrentStageWindow != PlanMissionWindow.EStageWindow.OriginDestination)
+                {
+                    return false;
+                }
+
+                SearchObjectWindow searchObjectWindow = uiManager.GetWindow<SearchObjectWindow>();
+                return searchObjectWindow != null &&
+                       searchObjectWindow.Open &&
+                       searchObjectWindow.ShowFromSearchInputField;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        internal static void PushMissionPlanningCameraSuppression()
+        {
+            suppressMissionPlanningCameraTargetDepth++;
+        }
+
+        internal static void PopMissionPlanningCameraSuppression()
+        {
+            if (suppressMissionPlanningCameraTargetDepth > 0)
+            {
+                suppressMissionPlanningCameraTargetDepth--;
+            }
+        }
 
         [HarmonyPrefix]
         private static void Prefix(InfoBase __instance, ref Transform __state)
@@ -162,12 +214,112 @@ namespace SolarExpanseUXTweaks.Patches
         [HarmonyPrefix]
         private static bool Prefix(Transform newTarget)
         {
+            if (MapObjectClickCameraSuppressionScopePatch.SuppressMissionPlanningCameraTarget)
+            {
+                return false;
+            }
+
             if (!MapObjectClickCameraSuppressionScopePatch.IsSuppressedMapObjectClickTarget(newTarget))
             {
                 return true;
             }
 
             return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(MyCameraController), nameof(MyCameraController.ChangeTarget), typeof(ObjectInfo), typeof(bool))]
+    internal static class MissionPlanningObjectInfoCameraChangeTargetPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix()
+        {
+            return !MapObjectClickCameraSuppressionScopePatch.SuppressMissionPlanningCameraTarget;
+        }
+    }
+
+    [HarmonyPatch(typeof(MyCameraController), nameof(MyCameraController.ChangeTargetForPlanMission), typeof(ObjectInfo))]
+    internal static class MissionPlanningCameraChangeTargetForPlanMissionPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix()
+        {
+            return !MapObjectClickCameraSuppressionScopePatch.SuppressMissionPlanningCameraTarget;
+        }
+    }
+
+    [HarmonyPatch]
+    internal static class PlanMissionDestinationCameraSuppressionScopePatch
+    {
+        private static IEnumerable<MethodBase> TargetMethods()
+        {
+            Type destinationTabType = typeof(PMTabDestination);
+
+            foreach (string methodName in new[]
+            {
+                "ActiveTab",
+                "DestinationInputOnObjectSelect",
+                "StartInputOnObjectSelect"
+            })
+            {
+                MethodInfo method = AccessTools.Method(destinationTabType, methodName);
+                if (method != null)
+                {
+                    yield return method;
+                }
+            }
+        }
+
+        [HarmonyPrefix]
+        private static void Prefix()
+        {
+            MapObjectClickCameraSuppressionScopePatch.PushMissionPlanningCameraSuppression();
+        }
+
+        [HarmonyFinalizer]
+        private static void Finalizer()
+        {
+            MapObjectClickCameraSuppressionScopePatch.PopMissionPlanningCameraSuppression();
+        }
+    }
+
+    [HarmonyPatch(typeof(SearchRow), "OnClickSelectButton")]
+    internal static class PlanMissionSearchRowCameraSuppressionScopePatch
+    {
+        [HarmonyPrefix]
+        private static void Prefix(ref bool __state)
+        {
+            if (!MapObjectClickCameraSuppressionScopePatch.IsMissionPlanningSearchSelectionContext())
+            {
+                return;
+            }
+
+            __state = true;
+            MapObjectClickCameraSuppressionScopePatch.PushMissionPlanningCameraSuppression();
+        }
+
+        [HarmonyFinalizer]
+        private static void Finalizer(bool __state)
+        {
+            if (__state)
+            {
+                MapObjectClickCameraSuppressionScopePatch.PopMissionPlanningCameraSuppression();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(PlanMissionWindow), nameof(PlanMissionWindow.ChangeTargetForCamera))]
+    internal static class PlanMissionDestinationCameraChangeTargetPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(PlanMissionWindow __instance)
+        {
+            if (MapObjectClickCameraSuppressionScopePatch.SuppressMissionPlanningCameraTarget)
+            {
+                return false;
+            }
+
+            return __instance == null || __instance.CurrentStageWindow != PlanMissionWindow.EStageWindow.OriginDestination;
         }
     }
 
