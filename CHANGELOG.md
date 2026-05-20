@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Made notification history scrollable and collapsed repeated identical notifications into one row with a count badge.
+
 ### Changed
 - Suppressed automatic camera zoom/follow when changing the origin or destination in the mission planning window.
 

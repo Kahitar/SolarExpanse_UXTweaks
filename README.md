@@ -8,6 +8,7 @@ A small quality-of-life mod for Solar Expanse.
 - **Double-click to focus:** double-click the same body or mission when you do want the old zoom-in-and-follow behavior.
 - **Calmer mission planning:** changing the origin or destination while planning a mission no longer pulls the camera away from your current map view.
 - **Easier body info panels:** long Facilities, Resources, Rockets, Launch Vehicles, and Missions lists are shown in the main Object Info panel instead of tiny nested scroll boxes.
+- **Cleaner notification history:** the notification history can scroll and repeated identical notifications collapse into one row with a right-side count badge.
 
 ## Installation
 
