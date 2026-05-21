@@ -2,13 +2,19 @@
 
 A small quality-of-life mod for Solar Expanse.
 
+## New in 1.2.0
+
+- Notification history is now scrollable, so older messages remain reachable when the log fills up.
+- Repeated identical notifications are collapsed into a single history row with an `xN` count badge.
+- Mission planning origin and destination changes no longer force the camera to zoom to or follow the selected object.
+
 ## Features
 
-- **Less camera jumping:** clicking a planet, moon, asteroid, or mission opens its info without suddenly zooming all the way in and locking the camera to it.
-- **Double-click to focus:** double-click the same body or mission when you do want the old zoom-in-and-follow behavior.
-- **Calmer mission planning:** changing the origin or destination while planning a mission no longer pulls the camera away from your current map view.
-- **Easier body info panels:** long Facilities, Resources, Rockets, Launch Vehicles, and Missions lists are shown in the main Object Info panel instead of tiny nested scroll boxes.
-- **Cleaner notification history:** the notification history can scroll and repeated identical notifications collapse into one row with a right-side count badge.
+- **Less camera jumping:** single-clicking a planet, moon, asteroid, or mission opens its info without suddenly zooming all the way in and locking the camera to it.
+- **Double-click to focus:** double-click the same body or mission when you do want the original zoom-in-and-follow behavior.
+- **Calmer mission planning:** choosing an origin or destination, including from the search picker, keeps your current map view in place.
+- **Easier body info panels:** long Facilities, Resources, Rockets, Launch Vehicles, and Missions lists are expanded into the main Object Info panel instead of tiny nested scroll boxes.
+- **Cleaner notification history:** the notification history scrolls, and repeated identical notifications collapse into one row with a right-side count badge.
 
 ## Installation
 
