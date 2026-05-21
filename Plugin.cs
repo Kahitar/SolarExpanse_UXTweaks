@@ -5,7 +5,7 @@ using HarmonyLib;
 
 namespace SolarExpanseUXTweaks
 {
-    [BepInPlugin("com.mod.solarexpanse.uxtweaks", "UXTweaks", "1.1.0")]
+    [BepInPlugin("com.mod.solarexpanse.uxtweaks", "UXTweaks", "1.2.0")]
     public class Plugin : BaseUnityPlugin
     {
         internal static ManualLogSource Log;
